@@ -1,27 +1,11 @@
 package main
 
 import (
-	"github.com/reiver/go-oi"
 	"github.com/reiver/go-telnet"
 	"github.com/reiver/go-telnet/telsh"
 
 	"github.com/yamamushi/teomamud/handlers"
-
-	"io"
 )
-
-
-
-func fiveHandler(stdin io.ReadCloser, stdout io.WriteCloser, stderr io.WriteCloser, args ...string) error {
-	oi.LongWriteString(stdout, "The number FIVE looks like this: 5\r\n")
-
-	return nil
-}
-
-func fiveProducer(ctx telnet.Context, name string, args ...string) telsh.Handler{
-	return telsh.PromoteHandlerFunc(fiveHandler)
-}
-
 
 
 func main() {
@@ -38,22 +22,15 @@ func main() {
 
 `
 
-
 	// Register the "five" command.
-	commandName     := "five"
-	commandProducer := telsh.ProducerFunc(fiveProducer)
-
-	shellHandler.Register(commandName, commandProducer)
-
+	shellHandler.Register("five", telsh.ProducerFunc(handlers.FiveProducer))
 
 	// Register the "dance" command.
-	commandName      = "dance"
-	commandProducer  = telsh.ProducerFunc(handlers.DanceProducer)
-
-	shellHandler.Register(commandName, commandProducer)
-
-
 	shellHandler.Register("dance", telsh.ProducerFunc(handlers.DanceProducer))
+
+	// Register the "help" command.
+	shellHandler.Register("help",telsh.ProducerFunc(handlers.HelpProducer))
+
 
 	addr := ":420"
 	if err := telnet.ListenAndServe(addr, shellHandler); nil != err {
